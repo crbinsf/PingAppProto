@@ -7,6 +7,10 @@
 //
 
 #import "AppDelegate.h"
+#import <Parse/Parse.h>
+
+#import "ViewController.h"
+#import "Constants.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +21,29 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    // Parse connection
+    [Parse setApplicationId:@"PkxSRxc92EU7i3NdeMfujJApy1dOyYMWv1Zzp2hs"
+                  clientKey:@"KEkKPmakpIaoyKHmYSMjZFh0DnK3INBF5nspNH94"];
+    
+    // Analytics tracking - application opens
+    [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
+
+    //CGRect screenBounds = [[UIScreen mainScreen] bounds];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    // If user hasn't registered, take them to registration screen
+    if ([[NSUserDefaults standardUserDefaults] valueForKey:kRegisteredUserID] != nil) {
+        // Take user directly to Map View
+    } else {
+        ViewController *rootController = [[ViewController alloc] init];
+        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:rootController];
+        window.rootViewController = navController;
+    }
+    
+    [window makeKeyAndVisible];
+    [self setWindow:window];
+    
+    
     return YES;
 }
 

@@ -10,6 +10,14 @@
 
 @interface ViewController : UIViewController
 
+@property (nonatomic, strong) UITextField *tf_fname;
+@property (nonatomic, strong) UITextField *tf_lname;
+@property (nonatomic, strong) UITextField *tf_email;
+
+@property (nonatomic, strong) UIButton *btn_register;
+
+@property (nonatomic, strong) UIView *regView;
+
 
 @end
 
