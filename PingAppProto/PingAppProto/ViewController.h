@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PingViewController.h"
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <UITextFieldDelegate>
 
 @property (nonatomic, strong) UITextField *tf_fname;
 @property (nonatomic, strong) UITextField *tf_lname;
@@ -16,8 +17,7 @@
 
 @property (nonatomic, strong) UIButton *btn_register;
 
-@property (nonatomic, strong) UIView *regView;
-
+@property (nonatomic, strong) PingViewController *pingController;
 
 @end
 

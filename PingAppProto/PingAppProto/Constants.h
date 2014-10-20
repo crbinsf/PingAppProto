@@ -12,4 +12,18 @@
 #define kRegisteredUserID   @"RegisteredUserID"
 #define kUserLocID          @"UserLocationID"
 
+// PingUser object
+#define kPingUser           @"PingUser"
+// object attributes
+#define kPingUser_fName     @"fname"
+#define kPingUser_lName     @"lname"
+#define kPingUser_email     @"email"
+
+// PingUserLocation object
+#define kPingUserLocation   @"PingUserLocation"
+// object attributes
+#define kPingUsrLoc_lat     @"userLatitude"
+#define kPingUsrLoc_lon     @"userLongitude"
+#define kPingUsrLoc_time    @"userLocTimestamp"
+
 #endif

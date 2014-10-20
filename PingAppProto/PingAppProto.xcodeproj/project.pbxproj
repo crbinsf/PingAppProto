@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		434048F619F4939B00C69CF0 /* PingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 434048F519F4939B00C69CF0 /* PingViewController.m */; };
 		4395028E19F44EEB006C6DB7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4395028D19F44EEB006C6DB7 /* main.m */; };
 		4395029119F44EEB006C6DB7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4395029019F44EEB006C6DB7 /* AppDelegate.m */; };
 		4395029419F44EEB006C6DB7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4395029319F44EEB006C6DB7 /* ViewController.m */; };
@@ -57,6 +58,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		434048F419F4939B00C69CF0 /* PingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PingViewController.h; sourceTree = "<group>"; };
+		434048F519F4939B00C69CF0 /* PingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PingViewController.m; sourceTree = "<group>"; };
 		4395028819F44EEB006C6DB7 /* PingAppProto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PingAppProto.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4395028C19F44EEB006C6DB7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4395028D19F44EEB006C6DB7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -164,6 +167,8 @@
 				4395029019F44EEB006C6DB7 /* AppDelegate.m */,
 				4395029219F44EEB006C6DB7 /* ViewController.h */,
 				4395029319F44EEB006C6DB7 /* ViewController.m */,
+				434048F419F4939B00C69CF0 /* PingViewController.h */,
+				434048F519F4939B00C69CF0 /* PingViewController.m */,
 				4395029819F44EEB006C6DB7 /* Images.xcassets */,
 				4395028B19F44EEB006C6DB7 /* Supporting Files */,
 				439502DF19F451DD006C6DB7 /* Constants.h */,
@@ -319,6 +324,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				434048F619F4939B00C69CF0 /* PingViewController.m in Sources */,
 				4395029419F44EEB006C6DB7 /* ViewController.m in Sources */,
 				4395029119F44EEB006C6DB7 /* AppDelegate.m in Sources */,
 				4395028E19F44EEB006C6DB7 /* main.m in Sources */,
@@ -507,6 +513,7 @@
 				439502AD19F44EEB006C6DB7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		439502AE19F44EEB006C6DB7 /* Build configuration list for PBXNativeTarget "PingAppProtoTests" */ = {
 			isa = XCConfigurationList;
@@ -515,6 +522,7 @@
 				439502B019F44EEB006C6DB7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

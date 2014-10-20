@@ -10,6 +10,7 @@
 #import <Parse/Parse.h>
 
 #import "ViewController.h"
+#import "PingViewController.h"
 #import "Constants.h"
 
 @interface AppDelegate ()
@@ -34,6 +35,9 @@
     // If user hasn't registered, take them to registration screen
     if ([[NSUserDefaults standardUserDefaults] valueForKey:kRegisteredUserID] != nil) {
         // Take user directly to Map View
+        PingViewController *pingController = [[PingViewController alloc] init];
+        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:pingController];
+        window.rootViewController = navController;
     } else {
         ViewController *rootController = [[ViewController alloc] init];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:rootController];
