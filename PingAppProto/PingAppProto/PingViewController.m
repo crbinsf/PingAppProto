@@ -9,11 +9,14 @@
 #import "PingViewController.h"
 #import "Constants.h"
 #import <Parse/Parse.h>
+#import "UserLocAnnotation.h"
 
 @interface PingViewController ()
 
 - (void)_startStopPing;
 - (void)_mapTypeSelected;
+- (void)_getUsersLocationData;
+- (void)_showAlertWithTitle:(NSString *)title message:(NSString *)message;
 
 @end
 
@@ -25,9 +28,12 @@
 @synthesize btn_segmentedControl;
 @synthesize mapToolbar;
 @synthesize sc_chooseMapType;
+@synthesize getTimer;
+@synthesize noUsersAlert;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     // Do any additional setup after loading the view.
     
     [self.navigationController setNavigationBarHidden:YES animated:YES];
@@ -39,6 +45,11 @@
     [self.locationManager requestAlwaysAuthorization];
     if ([CLLocationManager locationServicesEnabled]) {
         [self.locationManager startMonitoringSignificantLocationChanges];
+    } else {
+        // Show alert that app really does need the user's location, and that
+        // it can be allowed from device settings
+        [self _showAlertWithTitle:@"Here's the thing..."
+                          message:@"We need location services enabled to show you your friends location relative to yours. Location services for the app can be enabled in the device settings."];
     }
     
     self.pingMapView = [[MKMapView alloc] init];
@@ -51,10 +62,13 @@
     
     // Start / Stop Ping Bar Button Item
     NSString *pingTitle = @"";
-    if ([[NSUserDefaults standardUserDefaults] valueForKey:kUserLocID] != nil)
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:kPingLocationOn]) {
+        // User left app with Start Ping active
         pingTitle = @"Stop Ping";
-    else
+    } else {
+        // User left app with Stop Ping active
         pingTitle = @"Start Ping";
+    }
     
     self.btn_startStopPing = [[UIBarButtonItem alloc] initWithTitle:pingTitle
                                                               style:UIBarButtonItemStylePlain
@@ -80,13 +94,22 @@
     [self.view addSubview:self.mapToolbar];
     
     // Get list of PingUserLocation objects - add as annotations on map
-    
+    [self _getUsersLocationData];
     
     // set up time fired event to retrieve list of location objects
     // in method used, use logic to determine if a user is 'inactive'
     // (haven't moved in 10 minutes) or 'offline' (haven't moved in 30 minutes)
+    self.getTimer = [NSTimer scheduledTimerWithTimeInterval:60.0 target:self selector:@selector(callGetUserLocationsAfterInterval:) userInfo:nil repeats:YES];
     
     
+    
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    // Re initiailize when the view appears
+    self.noUsersAlert = NO;
 }
 
 - (void)viewDidLayoutSubviews {
@@ -119,9 +142,13 @@
 - (void)_startStopPing {
     if ([self.btn_startStopPing.title isEqualToString:@"Start Ping"]) {
         self.btn_startStopPing.title = @"Stop Ping";
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kPingLocationOn];
     } else {
         self.btn_startStopPing.title = @"Start Ping";
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kPingLocationOn];
     }
+    
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)_mapTypeSelected {
@@ -140,6 +167,95 @@
     }
 }
 
+- (void)_getUsersLocationData {
+    // Get User Objects
+    PFQuery *usersQuery = [PFQuery queryWithClassName:kPingUser];
+    [usersQuery whereKey:@"objectID" notEqualTo:kRegisteredUserID];
+    
+    NSArray *usersArray = [usersQuery findObjects];
+    
+    if ([usersArray count] > 0) {
+        // first, remove existing annotations
+        for (id <MKAnnotation> annotation in self.pingMapView.annotations) {
+            if ([annotation isKindOfClass:[UserLocAnnotation class]]) {
+                [self.pingMapView removeAnnotation:annotation];
+            }
+        }
+        
+        // loop through objects and create map annotations
+        for (PFObject *user in usersArray) {
+            
+            // Determine the user status based on timestamp of last
+            // location update
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateStyle:NSDateFormatterShortStyle];
+            [dateFormatter setTimeStyle:NSDateFormatterFullStyle];
+            
+            NSDate *coordDate = [dateFormatter dateFromString:user[kPingUser_time]];
+            NSTimeInterval distanceBtwDates = [coordDate timeIntervalSinceNow];
+            
+            double secondsInAMinute = 60;
+            NSInteger minutesBetweenDates = distanceBtwDates / secondsInAMinute;
+            
+            NSString *status = @"Online";
+            
+            if (minutesBetweenDates >= 30 &&
+                minutesBetweenDates <= 60) {
+                status = @"Idle";
+            } else if (minutesBetweenDates > 60) {
+                status =  @"Offline";
+            }
+            
+            
+            CLLocationCoordinate2D tempCoord;
+            tempCoord.latitude = [user[kPingUser_lat] doubleValue];
+            tempCoord.longitude = [user[kPingUser_lon] doubleValue];
+            UserLocAnnotation *tempAnnotation = [[UserLocAnnotation alloc] initWithTitle:[NSString stringWithFormat:@"%@ %@", user[kPingUser_fName], user[kPingUser_lName]]
+                                                                                subtitle:status
+                                                                                  userID:[user objectId]
+                                                                           andCoordinate:tempCoord];
+            
+            [self.pingMapView addAnnotation:tempAnnotation];
+        }
+
+    } else {
+        if (!self.noUsersAlert) {
+            // Don't spam the user with this message - only show once per session (if applicable)
+            self.noUsersAlert = YES;
+            [self _showAlertWithTitle:@"Bummer..." message:@"Nobody else is using the app yet! Check back soon..."];
+        }
+    }
+    
+}
+
+#pragma mark -
+#pragma mark - NSTimer associated method
+
+- (void)callGetUserLocationsAfterInterval:(NSTimer *)t {
+    [self _getUsersLocationData];
+}
+
+#pragma mark -
+#pragma mark - UIAlertController alert method
+
+- (void)_showAlertWithTitle:(NSString *)title message:(NSString *)message {
+    UIAlertController *errorAlert = [UIAlertController alertControllerWithTitle:title
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
+                                                       style:UIAlertActionStyleDefault
+                                                     handler:^(UIAlertAction * action)
+                               {
+                                   [errorAlert dismissViewControllerAnimated:YES completion:nil];
+                                   
+                               }];
+    
+    [errorAlert addAction:okAction];
+    [self presentViewController:errorAlert animated:YES completion:nil];
+
+}
+
 #pragma mark -
 #pragma mark - MKMapView Delegate methods
 
@@ -150,38 +266,34 @@
 - (void)locationManager:(CLLocationManager *)manager
      didUpdateLocations:(NSArray *)locations {
     
-    // Get the most recent location update
-    CLLocation *currentLocation = [locations objectAtIndex:[locations count] - 1];
-    // Take location returned and submit to web service
-    PFObject *userLocationObject = [PFObject objectWithClassName:kPingUserLocation];
-    userLocationObject[kPingUsrLoc_lat] = [NSString stringWithFormat:@"%f", currentLocation.coordinate.latitude];
-    userLocationObject[kPingUsrLoc_lon] = [NSString stringWithFormat:@"%f", currentLocation.coordinate.longitude];
+    // First, check to see if user has selected to transmit their location
+    // to the web service
     
-    NSString *dateString = [NSDateFormatter localizedStringFromDate:currentLocation.timestamp
-                                                          dateStyle:NSDateFormatterShortStyle
-                                                          timeStyle:NSDateFormatterFullStyle];
-    userLocationObject[kPingUsrLoc_time] = dateString;
-    
-    [userLocationObject saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-        if (succeeded) {
-            // First, grab the object ID and store in user defaults - this
-            // will allow the app to know that registration was successful,
-            // and identify the user when updating location in the app.
-            [[NSUserDefaults standardUserDefaults] setValue:[userLocationObject objectId] forKey:kUserLocID];
-            [[NSUserDefaults standardUserDefaults] synchronize];
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:kPingLocationOn]) {
+        // Get the most recent location update
+        CLLocation *currentLocation = [locations objectAtIndex:[locations count] - 1];
+        
+        // Update existing registered user record
+        NSString *userID = [[NSUserDefaults standardUserDefaults] valueForKey:kRegisteredUserID];
+        PFQuery *query = [PFQuery queryWithClassName:kPingUser];
+        
+        // Retrieve the object by id
+        [query getObjectInBackgroundWithId:userID block:^(PFObject *updUserRecord, NSError *error) {
+            if (!error) {
+                // Now, update with new location data
+                updUserRecord[kPingUser_lat] = [NSString stringWithFormat:@"%f", currentLocation.coordinate.latitude];
+                updUserRecord[kPingUser_lon] = [NSString stringWithFormat:@"%f", currentLocation.coordinate.longitude];
+                NSString *dateString = [NSDateFormatter localizedStringFromDate:currentLocation.timestamp
+                                                                      dateStyle:NSDateFormatterShortStyle
+                                                                      timeStyle:NSDateFormatterFullStyle];
+                
+                updUserRecord[kPingUser_time] = dateString;
+                [updUserRecord saveInBackground];
+            }
             
-            // push to next controller
-            NSLog(@"%@", [userLocationObject description]);
-            
-            // Update map with user's new location?
-            
-            
-        } else {
-            // something went wrong, eval error and present info to user
-        }
-    }];
+        }];
 
-    
+    }
 }
 
 - (void)locationManager:(CLLocationManager *)manager

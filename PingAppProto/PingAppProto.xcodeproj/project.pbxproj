@@ -45,6 +45,8 @@
 		439502DE19F4512E006C6DB7 /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 439502D019F4508A006C6DB7 /* Accounts.framework */; };
 		439502E119F45986006C6DB7 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 439502E019F45986006C6DB7 /* Default-568h@2x.png */; };
 		439502EB19F461DE006C6DB7 /* Launch Screen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 439502EA19F461DE006C6DB7 /* Launch Screen.xib */; };
+		43E45EF219F60BE900C12679 /* DefaultPreferences.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43E45EF119F60BE900C12679 /* DefaultPreferences.plist */; };
+		43E45EF519F6162200C12679 /* UserLocAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43E45EF419F6162200C12679 /* UserLocAnnotation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +91,9 @@
 		439502DF19F451DD006C6DB7 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		439502E019F45986006C6DB7 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		439502EA19F461DE006C6DB7 /* Launch Screen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "Launch Screen.xib"; sourceTree = "<group>"; };
+		43E45EF119F60BE900C12679 /* DefaultPreferences.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DefaultPreferences.plist; sourceTree = "<group>"; };
+		43E45EF319F6162200C12679 /* UserLocAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserLocAnnotation.h; sourceTree = "<group>"; };
+		43E45EF419F6162200C12679 /* UserLocAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserLocAnnotation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +174,8 @@
 				4395029319F44EEB006C6DB7 /* ViewController.m */,
 				434048F419F4939B00C69CF0 /* PingViewController.h */,
 				434048F519F4939B00C69CF0 /* PingViewController.m */,
+				43E45EF319F6162200C12679 /* UserLocAnnotation.h */,
+				43E45EF419F6162200C12679 /* UserLocAnnotation.m */,
 				4395029819F44EEB006C6DB7 /* Images.xcassets */,
 				4395028B19F44EEB006C6DB7 /* Supporting Files */,
 				439502DF19F451DD006C6DB7 /* Constants.h */,
@@ -181,6 +188,7 @@
 			children = (
 				4395028C19F44EEB006C6DB7 /* Info.plist */,
 				4395028D19F44EEB006C6DB7 /* main.m */,
+				43E45EF119F60BE900C12679 /* DefaultPreferences.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -305,6 +313,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4395029919F44EEB006C6DB7 /* Images.xcassets in Resources */,
+				43E45EF219F60BE900C12679 /* DefaultPreferences.plist in Resources */,
 				439502EB19F461DE006C6DB7 /* Launch Screen.xib in Resources */,
 				439502E119F45986006C6DB7 /* Default-568h@2x.png in Resources */,
 			);
@@ -324,6 +333,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43E45EF519F6162200C12679 /* UserLocAnnotation.m in Sources */,
 				434048F619F4939B00C69CF0 /* PingViewController.m in Sources */,
 				4395029419F44EEB006C6DB7 /* ViewController.m in Sources */,
 				4395029119F44EEB006C6DB7 /* AppDelegate.m in Sources */,

@@ -111,6 +111,12 @@
         user[kPingUser_fName] = self.tf_fname.text;
         user[kPingUser_lName] = self.tf_lname.text;
         user[kPingUser_email] = self.tf_email.text;
+        // these fields are empty until tracking location
+        // Included here because Parse lazily creates the PingUser class if it
+        // does not yet exist
+        user[kPingUser_lat] = @"";
+        user[kPingUser_lon] = @"";
+        user[kPingUser_time] = @"";
         
         [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
             if (succeeded) {

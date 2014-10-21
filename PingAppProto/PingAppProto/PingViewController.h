@@ -18,7 +18,9 @@
 @property (nonatomic, strong) UIBarButtonItem *btn_segmentedControl;
 @property (nonatomic, strong) UISegmentedControl *sc_chooseMapType;
 
-
 @property (nonatomic, strong) CLLocationManager *locationManager;
+
+@property (nonatomic, strong) NSTimer *getTimer;
+@property (nonatomic, assign) BOOL noUsersAlert;
 
 @end

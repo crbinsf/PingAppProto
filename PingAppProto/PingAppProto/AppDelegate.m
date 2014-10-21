@@ -28,9 +28,17 @@
     
     // Analytics tracking - application opens
     [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
+    
+    // Register defaults for the app
+    NSURL *defaultPrefsFile = [[NSBundle mainBundle] URLForResource:@"DefaultPreferences"
+                                                      withExtension:@"plist"];
+    NSDictionary *defaultPrefs = [NSDictionary dictionaryWithContentsOfURL:defaultPrefsFile];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:defaultPrefs];
 
     //CGRect screenBounds = [[UIScreen mainScreen] bounds];
     UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    
     
     // If user hasn't registered, take them to registration screen
     if ([[NSUserDefaults standardUserDefaults] valueForKey:kRegisteredUserID] != nil) {
