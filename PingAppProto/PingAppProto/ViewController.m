@@ -13,6 +13,7 @@
 @interface ViewController ()
 
 - (void)_registerNewUser;
+- (BOOL)_isValidEmail:(NSString *)emailString Strict:(BOOL)strictFilter;
 
 @end
 
@@ -21,6 +22,7 @@
 @synthesize tf_fname, tf_lname, tf_email;
 @synthesize btn_register;
 @synthesize pingController;
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -53,6 +55,8 @@
     self.tf_email.placeholder = @"Email Address";
     self.tf_email.backgroundColor = [UIColor whiteColor];
     self.tf_email.autocorrectionType = UITextAutocorrectionTypeNo;
+    self.tf_email.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self.tf_email.keyboardType = UIKeyboardTypeEmailAddress;
     self.tf_email.returnKeyType = UIReturnKeyDone;
     [self.view addSubview:self.tf_email];
     
@@ -107,35 +111,58 @@
     if ([self.tf_fname.text length] > 0 &&
         [self.tf_lname.text length] > 0 &&
         [self.tf_email.text length] > 0) {
-        PFObject *user = [PFObject objectWithClassName:kPingUser];
-        user[kPingUser_fName] = self.tf_fname.text;
-        user[kPingUser_lName] = self.tf_lname.text;
-        user[kPingUser_email] = self.tf_email.text;
-        // these fields are empty until tracking location
-        // Included here because Parse lazily creates the PingUser class if it
-        // does not yet exist
-        user[kPingUser_lat] = @"";
-        user[kPingUser_lon] = @"";
-        user[kPingUser_time] = @"";
-        
-        [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-            if (succeeded) {
-                // First, grab the object ID and store in user defaults - this
-                // will allow the app to know that registration was successful,
-                // and identify the user when updating location in the app.
-                [[NSUserDefaults standardUserDefaults] setValue:[user objectId] forKey:kRegisteredUserID];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                
-                // push to next controller
-                NSLog(@"%@", [user description]);
-                
-                // Push next view controller
-                self.pingController = [[PingViewController alloc] init];
-                [self presentViewController:self.pingController animated:YES completion:nil];
-            } else {
-                // something went wrong, eval error and present info to user
-            }
-        }];
+        if ([self _isValidEmail:self.tf_email.text Strict:YES]) {
+            PFObject *user = [PFObject objectWithClassName:kPingUser];
+            user[kPingUser_fName] = self.tf_fname.text;
+            user[kPingUser_lName] = self.tf_lname.text;
+            user[kPingUser_email] = self.tf_email.text;
+            // these fields are empty until tracking location
+            // Included here because Parse lazily creates the PingUser class if it
+            // does not yet exist
+            user[kPingUser_lat] = @"";
+            user[kPingUser_lon] = @"";
+            user[kPingUser_time] = @"";
+            
+            [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    // First, grab the object ID and store in user defaults - this
+                    // will allow the app to know that registration was successful,
+                    // and identify the user when updating location in the app.
+                    [[NSUserDefaults standardUserDefaults] setValue:[user objectId] forKey:kRegisteredUserID];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    
+                    // push to next controller
+                    NSLog(@"%@", [user description]);
+                    
+                    // Push next view controller
+                    self.pingController = [[PingViewController alloc] init];
+                    [self.navigationController pushViewController:self.pingController animated:YES];
+                    //[self presentViewController:self.pingController animated:YES completion:nil];
+                } else {
+                    // something went wrong, eval error and present info to user
+                }
+            }];
+
+        } else {
+            // Present alert that email address must be valid
+            UIAlertController *errorAlert = [UIAlertController alertControllerWithTitle:@"Here's the thing..."
+                                                                                message:@"Your email address doesn't pass muster. Double check it and try again."
+                                                                         preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction * action)
+                                       {
+                                           [self.tf_email becomeFirstResponder];
+
+                                           [errorAlert dismissViewControllerAnimated:YES completion:nil];
+                                           
+                                       }];
+            
+            [errorAlert addAction:okAction];
+            [self presentViewController:errorAlert animated:YES completion:nil];
+
+        }
         
     } else {
         // Present alert that all fields must be filled in to register
@@ -185,6 +212,20 @@
     }
     
     return result;
+}
+
+#pragma mark -
+#pragma mark - Simple Email Validation
+
+- (BOOL)_isValidEmail:(NSString *)emailString Strict:(BOOL)strictFilter
+{
+    NSString *stricterFilterString = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+    NSString *laxString = @".+@.+\\.[A-Za-z]{2}[A-Za-z]*";
+    
+    NSString *emailRegex = strictFilter ? stricterFilterString : laxString;
+    NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
+    
+    return [emailTest evaluateWithObject:emailString];
 }
 
 @end
