@@ -6,11 +6,17 @@ Ping App Prototype
 Initial requirements for the project:
 
 *UIView with map
+
 *UIButton with start ping, stop ping
+
 *Set of users, Me Kaz Clarke, Johnny Jeremy
+
 *Display all users on map that are sharing location
+
 *Zoom map to scale of distance between users
+
 *Simple web service implementation (using Parse: https://www.parse.com)
+
 *Pick user we are by sliding a disk pick 1-5
 
 ============
